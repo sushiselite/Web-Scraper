@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import tkinter as tk
 from tkinter import ttk
 
-def scrape_url(url, what_to_scrape):
+def scrape_url(url):
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
@@ -11,7 +11,7 @@ def scrape_url(url, what_to_scrape):
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
-        data = [tag.text for tag in soup.select(what_to_scrape)]
+        data = [title.text for title in soup.find_all("h3")]
         if len(data) == 0:
             print("No data found.")
         return data
@@ -28,7 +28,7 @@ def show_dataset(data):
         return
 
     table = ttk.Treeview(window)
-    table["columns"] = ("Data")  # Specify column names
+    table["columns"] = ("Data")
 
     table.column("Data", width=200)
     table.heading("Data", text="Data")
@@ -49,8 +49,7 @@ def export_dataset(data, filename):
 
 def main():
     url = "https://www.reddit.com/"  # Example URL for Reddit homepage
-    what_to_scrape = "h3._eYtD2XCVieq6emjKBH3m"  # CSS selector for post titles
-    data = scrape_url(url, what_to_scrape)
+    data = scrape_url(url)
     show_dataset(data)
     export_dataset(data, "dataset.csv")
 
