@@ -5,10 +5,13 @@ from tkinter import ttk
 
 def scrape_url(url, what_to_scrape):
     try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for unsuccessful HTTP requests
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
-        data = [tag.text for tag in soup.find_all(what_to_scrape, class_="s1t1hnwn-2")]
+        data = [tag.text for tag in soup.select(what_to_scrape)]
         if len(data) == 0:
             print("No data found.")
         return data
@@ -25,6 +28,8 @@ def show_dataset(data):
         return
 
     table = ttk.Treeview(window)
+    table["columns"] = ("Data")  # Specify column names
+
     table.column("Data", width=200)
     table.heading("Data", text="Data")
 
@@ -43,8 +48,8 @@ def export_dataset(data, filename):
             writer.writerow([row])
 
 def main():
-    url = input("Enter the URL: ")
-    what_to_scrape = input("What do you want to scrape? (e.g., h1, p, etc.): ")
+    url = "https://www.reddit.com/"  # Example URL for Reddit homepage
+    what_to_scrape = "h3._eYtD2XCVieq6emjKBH3m"  # CSS selector for post titles
     data = scrape_url(url, what_to_scrape)
     show_dataset(data)
     export_dataset(data, "dataset.csv")
