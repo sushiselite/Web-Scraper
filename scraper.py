@@ -6,16 +6,15 @@ from tkinter import ttk
 def scrape_url(url, what_to_scrape):
     try:
         response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for unsuccessful HTTP requests
         soup = BeautifulSoup(response.content, "html.parser")
         data = [tag.text for tag in soup.find_all(what_to_scrape, class_="s1t1hnwn-2")]
         if len(data) == 0:
             print("No data found.")
         return data
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
         print("Error occurred:", e)
         return []
-
-
 
 def show_dataset(data):
     window = tk.Tk()
